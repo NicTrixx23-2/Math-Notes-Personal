@@ -62,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function() {
     resizeCanvas();
 
     // Prevent scrolling on touch devices when interacting with the canvas
-    canvasElement.style.touchAction = 'none';
     canvasElement.addEventListener("touchstart", function(event) {
         event.preventDefault();
     });
