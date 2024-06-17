@@ -17,4 +17,15 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('latex-output').innerText = exampleLatex;
         MathJax.typesetPromise();
     });
+
+    // Ensure the canvas resizes properly for touch devices
+    function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 });
