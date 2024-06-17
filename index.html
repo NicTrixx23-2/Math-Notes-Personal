@@ -3,47 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI & Machine Learning Math Notes</title>
+    <title>Math Notes</title>
     <link rel="stylesheet" href="styles/styles.css">
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']]
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 </head>
 <body>
     <header>
-        <h1>AI & Machine Learning Math Notes</h1>
+        <h1>Math Notes</h1>
     </header>
     <main>
-        <section id="linear-algebra">
-            <h2>Linear Algebra</h2>
-            <p>Linear algebra is fundamental in machine learning...</p>
-            <p>Equation example: \( A \mathbf{x} = \mathbf{b} \)</p>
-        </section>
-        <section id="calculus">
-            <h2>Calculus</h2>
-            <p>Calculus helps in understanding the changes and motion...</p>
-            <p>Equation example: \( \frac{d}{dx}f(x) = \lim_{{h \to 0}} \frac{f(x+h) - f(x)}{h} \)</p>
-        </section>
-        <section id="drawing">
-            <h2>Draw Your Equation</h2>
-            <canvas id="canvas" width="600" height="200" style="border: 1px solid #000;"></canvas>
+        <h2>Drawing Pad</h2>
+        <div id="drawing">
+            <canvas id="canvas"></canvas>
             <button id="clear">Clear</button>
             <button id="convert">Convert to LaTeX</button>
-            <p id="latex-output"></p>
-        </section>
+        </div>
+        <h2>LaTeX Output</h2>
+        <pre id="latex-output"></pre>
     </main>
     <footer>
-        <p>&copy; 2024 AI & ML Math Notes</p>
+        <p>&copy; 2024 Math Notes</p>
     </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.1/fabric.min.js"></script>
     <script src="scripts/script.js"></script>
 </body>
 </html>
