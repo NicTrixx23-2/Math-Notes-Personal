@@ -10,9 +10,6 @@ document.addEventListener("DOMContentLoaded", function() {
         isDrawingMode: true
     });
 
-    // Set initial canvas size
-    resizeCanvas();
-
     // Set drawing color and brush width
     fabricCanvas.freeDrawingBrush.color = drawingColor;
     fabricCanvas.freeDrawingBrush.width = 5;
@@ -44,14 +41,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Ensure the canvas resizes properly for touch devices
     function resizeCanvas() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
         const container = canvasElement.parentElement;
-        canvasElement.width = container.offsetWidth * ratio;
-        canvasElement.height = container.offsetHeight * ratio;
-        fabricCanvas.setWidth(container.offsetWidth * ratio);
-        fabricCanvas.setHeight(container.offsetHeight * ratio);
-        fabricCanvas.scale(ratio);
-        fabricCanvas.clear();
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const width = container.offsetWidth;
+        const height = container.offsetHeight;
+
+        canvasElement.width = width * ratio;
+        canvasElement.height = height * ratio;
+        fabricCanvas.setWidth(width);
+        fabricCanvas.setHeight(height);
+        fabricCanvas.setZoom(ratio);
         fabricCanvas.backgroundColor = 'white'; // Set initial background color
         fabricCanvas.renderAll();
     }
