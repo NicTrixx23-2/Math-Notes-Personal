@@ -1,0 +1,28 @@
+title: Math Notes
+description: >- # this means to ignore newlines until "baseurl:"
+  A website for creating and displaying math notes using a drawing pad and LaTeX conversion.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://YOUR_USERNAME.github.io/YOUR_REPOSITORY" # the base hostname & protocol for your site
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Exclude from processing.
+exclude:
+  - .github
+  - node_modules
+  - vendor/bundle
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+
+# Gems required by GitHub Pages
+github_pages:
+  dependencies:
+    - jekyll
+    - jekyll-feed
+    - jekyll-seo-tag
