@@ -22,4 +22,5 @@ main {
 
 canvas {
     border: 1px solid black;
+    touch-action: none; /* Prevent default touch actions */
 }
