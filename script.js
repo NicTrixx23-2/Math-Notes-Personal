@@ -1,4 +1,3 @@
-// script.js
 document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('canvas');
     const signaturePad = new SignaturePad(canvas);
