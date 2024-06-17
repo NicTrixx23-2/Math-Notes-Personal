@@ -10,7 +10,7 @@
         }
         canvas {
             border: 1px solid #000;
-            touch-action: none;
+            touch-action: none; /* Prevent default touch actions like scrolling */
         }
         #controls {
             margin-top: 10px;
@@ -29,81 +29,82 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const clearButton = document.getElementById('clear');
-    const convertButton = document.getElementById('convert');
-    const latexOutput = document.getElementById('latex-output');
-    let drawing = false;
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const clearButton = document.getElementById('clear');
+            const convertButton = document.getElementById('convert');
+            const latexOutput = document.getElementById('latex-output');
+            let drawing = false;
 
-    function startDrawing(event) {
-        drawing = true;
-        draw(event);
-    }
+            function startDrawing(event) {
+                drawing = true;
+                draw(event);
+            }
 
-    function endDrawing() {
-        drawing = false;
-        ctx.beginPath();
-    }
+            function endDrawing() {
+                drawing = false;
+                ctx.beginPath();
+            }
 
-    function draw(event) {
-        if (!drawing) return;
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#ff0000'; // Set your desired drawing color here
+            function draw(event) {
+                if (!drawing) return;
 
-        const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = '#ff0000'; // Set your desired drawing color here
 
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
 
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mouseup', endDrawing);
-    canvas.addEventListener('mousemove', draw);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
 
-    canvas.addEventListener('touchstart', (event) => {
-        const touch = event.touches[0];
-        startDrawing(touch);
-        event.preventDefault();
-    });
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', endDrawing);
+            canvas.addEventListener('mousemove', draw);
 
-    canvas.addEventListener('touchend', (event) => {
-        endDrawing();
-        event.preventDefault();
-    });
+            canvas.addEventListener('touchstart', (event) => {
+                const touch = event.touches[0];
+                startDrawing(touch);
+                event.preventDefault();
+            });
 
-    canvas.addEventListener('touchmove', (event) => {
-        const touch = event.touches[0];
-        draw(touch);
-        event.preventDefault();
-    });
+            canvas.addEventListener('touchend', (event) => {
+                endDrawing();
+                event.preventDefault();
+            });
 
-    clearButton.addEventListener('click', function() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
+            canvas.addEventListener('touchmove', (event) => {
+                const touch = event.touches[0];
+                draw(touch);
+                event.preventDefault();
+            });
 
-    convertButton.addEventListener('click', function() {
-        // Check if there is any drawing on the canvas
-        const drawingData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            clearButton.addEventListener('click', function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
 
-        // Pixel data will be non-zero if something is drawn
-        const isCanvasEmpty = !drawingData.some(channel => channel !== 0);
+            convertButton.addEventListener('click', function() {
+                const drawingData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
-        if (isCanvasEmpty) {
-            alert("Please draw something first.");
-            return;
-        }
+                // Check if there is any drawing on the canvas
+                const isCanvasEmpty = !drawingData.some(channel => channel !== 0);
 
-        const imageData = canvas.toDataURL();
-        console.log(imageData);
+                if (isCanvasEmpty) {
+                    alert("Please draw something first.");
+                    return;
+                }
 
-        const exampleLatex = "\\frac{d}{dx}f(x) = \\lim_{{h \\to 0}} \\frac{f(x+h) - f(x)}{h}";
-        latexOutput.innerText = exampleLatex;
-        // Additional logic to process LaTeX conversion
-    });
-});
+                // Example LaTeX output
+                const exampleLatex = "\\frac{d}{dx}f(x) = \\lim_{{h \\to 0}} \\frac{f(x+h) - f(x)}{h}";
+                latexOutput.innerText = exampleLatex;
+                // Additional logic to process LaTeX conversion if needed
+            });
+        });
+    </script>
+</body>
+</html>
