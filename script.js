@@ -1,23 +1,37 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const canvas = document.getElementById('canvas');
-    const signaturePad = new SignaturePad(canvas);
+    const canvasElement = document.getElementById('canvas');
     const clearButton = document.getElementById('clear');
     const convertButton = document.getElementById('convert');
     const latexOutput = document.getElementById('latex-output');
+    const drawingColor = '#ff0000'; // Set your desired drawing color here
+
+    // Initialize Fabric.js canvas
+    const fabricCanvas = new fabric.Canvas('canvas', {
+        isDrawingMode: true
+    });
+
+    // Set initial canvas size
+    resizeCanvas();
+
+    // Set drawing color and brush width
+    fabricCanvas.freeDrawingBrush.color = drawingColor;
+    fabricCanvas.freeDrawingBrush.width = 5;
 
     // Clear the canvas
     clearButton.addEventListener('click', function() {
-        signaturePad.clear();
+        fabricCanvas.clear();
+        fabricCanvas.backgroundColor = 'white'; // Preserve background color
+        fabricCanvas.renderAll();
     });
 
     // Convert the drawing to LaTeX
     convertButton.addEventListener('click', async function() {
-        if (signaturePad.isEmpty()) {
+        if (fabricCanvas.isEmpty()) {
             alert("Please draw something first.");
             return;
         }
 
-        const imageData = signaturePad.toDataURL();
+        const imageData = fabricCanvas.toDataURL();
 
         // Log the imageData for now (you can replace this with actual API integration)
         console.log(imageData);
@@ -31,10 +45,15 @@ document.addEventListener("DOMContentLoaded", function() {
     // Ensure the canvas resizes properly for touch devices
     function resizeCanvas() {
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        canvas.getContext("2d").scale(ratio, ratio);
-        signaturePad.clear(); // Clears the canvas after resizing to avoid misalignment issues
+        const container = canvasElement.parentElement;
+        canvasElement.width = container.offsetWidth * ratio;
+        canvasElement.height = container.offsetHeight * ratio;
+        fabricCanvas.setWidth(container.offsetWidth * ratio);
+        fabricCanvas.setHeight(container.offsetHeight * ratio);
+        fabricCanvas.scale(ratio);
+        fabricCanvas.clear();
+        fabricCanvas.backgroundColor = 'white'; // Set initial background color
+        fabricCanvas.renderAll();
     }
 
     // Handle window resize events
@@ -44,14 +63,14 @@ document.addEventListener("DOMContentLoaded", function() {
     resizeCanvas();
 
     // Prevent scrolling on touch devices when interacting with the canvas
-    canvas.style.touchAction = 'none';
-    canvas.addEventListener("touchstart", function(event) {
+    canvasElement.style.touchAction = 'none';
+    canvasElement.addEventListener("touchstart", function(event) {
         event.preventDefault();
     });
-    canvas.addEventListener("touchmove", function(event) {
+    canvasElement.addEventListener("touchmove", function(event) {
         event.preventDefault();
     });
-    canvas.addEventListener("touchend", function(event) {
+    canvasElement.addEventListener("touchend", function(event) {
         event.preventDefault();
     });
 });
