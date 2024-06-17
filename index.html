@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math Notes</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.1/fabric.min.js"></script>
 </head>
 <body>
     <header>
@@ -13,7 +14,7 @@
     <main>
         <h2>Drawing Pad</h2>
         <div id="drawing">
-            <canvas id="canvas"></canvas>
+            <canvas id="canvas" width="800" height="400" style="border:1px solid #000;"></canvas>
             <button id="clear">Clear</button>
             <button id="convert">Convert to LaTeX</button>
         </div>
@@ -23,7 +24,6 @@
     <footer>
         <p>&copy; 2024 Math Notes</p>
     </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.5.1/fabric.min.js"></script>
     <script src="scripts/script.js"></script>
 </body>
 </html>
