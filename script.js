@@ -16,6 +16,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // Example LaTeX output (replace with actual API response)
         const exampleLatex = "\\frac{d}{dx}f(x) = \\lim_{{h \\to 0}} \\frac{f(x+h) - f(x)}{h}";
         document.getElementById('latex-output').innerText = exampleLatex;
-        MathJax.typeset();
+        MathJax.typesetPromise();
     });
 });
