@@ -1,74 +1,69 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const canvasElement = document.getElementById('canvas');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
     const clearButton = document.getElementById('clear');
     const convertButton = document.getElementById('convert');
     const latexOutput = document.getElementById('latex-output');
-    const drawingColor = '#ff0000'; // Set your desired drawing color here
+    let drawing = false;
 
-    // Initialize Fabric.js canvas
-    const fabricCanvas = new fabric.Canvas('canvas', {
-        isDrawingMode: true
+    function startDrawing(event) {
+        drawing = true;
+        draw(event);
+    }
+
+    function endDrawing() {
+        drawing = false;
+        ctx.beginPath();
+    }
+
+    function draw(event) {
+        if (!drawing) return;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#ff0000'; // Set your desired drawing color here
+
+        ctx.lineTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(event.clientX - canvas.offsetLeft, event.clientY - canvas.offsetTop);
+    }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mouseup', endDrawing);
+    canvas.addEventListener('mousemove', draw);
+
+    canvas.addEventListener('touchstart', (event) => {
+        const touch = event.touches[0];
+        startDrawing(touch);
+        event.preventDefault();
     });
 
-    // Set drawing color and brush width
-    fabricCanvas.freeDrawingBrush.color = drawingColor;
-    fabricCanvas.freeDrawingBrush.width = 5;
+    canvas.addEventListener('touchend', (event) => {
+        endDrawing();
+        event.preventDefault();
+    });
 
-    // Clear the canvas
+    canvas.addEventListener('touchmove', (event) => {
+        const touch = event.touches[0];
+        draw(touch);
+        event.preventDefault();
+    });
+
     clearButton.addEventListener('click', function() {
-        fabricCanvas.clear();
-        fabricCanvas.backgroundColor = 'white'; // Preserve background color
-        fabricCanvas.renderAll();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
-    // Convert the drawing to LaTeX
-    convertButton.addEventListener('click', async function() {
-        if (fabricCanvas.isEmpty()) {
+    convertButton.addEventListener('click', function() {
+        if (ctx.canvas.toDataURL() === ctx.canvas.toDataURL('image/png', 0.0)) {
             alert("Please draw something first.");
             return;
         }
 
-        const imageData = fabricCanvas.toDataURL();
-
-        // Log the imageData for now (you can replace this with actual API integration)
+        const imageData = canvas.toDataURL();
         console.log(imageData);
 
-        // Example LaTeX output (replace with actual API response)
         const exampleLatex = "\\frac{d}{dx}f(x) = \\lim_{{h \\to 0}} \\frac{f(x+h) - f(x)}{h}";
         latexOutput.innerText = exampleLatex;
         MathJax.typesetPromise();
-    });
-
-    // Ensure the canvas resizes properly for touch devices
-    function resizeCanvas() {
-        const container = canvasElement.parentElement;
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        const width = container.offsetWidth;
-        const height = container.offsetHeight;
-
-        canvasElement.width = width * ratio;
-        canvasElement.height = height * ratio;
-        fabricCanvas.setWidth(width);
-        fabricCanvas.setHeight(height);
-        fabricCanvas.setZoom(ratio);
-        fabricCanvas.backgroundColor = 'white'; // Set initial background color
-        fabricCanvas.renderAll();
-    }
-
-    // Handle window resize events
-    window.addEventListener("resize", resizeCanvas);
-
-    // Initial resize of the canvas
-    resizeCanvas();
-
-    // Prevent scrolling on touch devices when interacting with the canvas
-    canvasElement.addEventListener("touchstart", function(event) {
-        event.preventDefault();
-    });
-    canvasElement.addEventListener("touchmove", function(event) {
-        event.preventDefault();
-    });
-    canvasElement.addEventListener("touchend", function(event) {
-        event.preventDefault();
     });
 });
