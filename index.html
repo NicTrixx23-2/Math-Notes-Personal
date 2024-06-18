@@ -1,25 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>MNIST TensorFlow.js and Drawing</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing Pad</title>
     <style>
-        #canvas {
-            border: 1px solid black;
+        body {
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 1px solid #000;
+            touch-action: none; /* Prevent default touch actions like scrolling */
+        }
+        #controls {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div>
-        <canvas id="canvas" width="280" height="280"></canvas>
+    <h1>Drawing Pad</h1>
+    <canvas id="canvas" width="800" height="400"></canvas>
+    <div id="controls">
         <button id="clear">Clear</button>
         <button id="convert">Convert to LaTeX</button>
-        <div id="latex-output"></div>
     </div>
+    <h2>LaTeX Output</h2>
+    <pre id="latex-output"></pre>
+
     <script>
-        // Drawing functionality
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             const clearButton = document.getElementById('clear');
@@ -75,11 +84,11 @@
                 event.preventDefault();
             });
 
-            clearButton.addEventListener('click', function () {
+            clearButton.addEventListener('click', function() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             });
 
-            convertButton.addEventListener('click', function () {
+            convertButton.addEventListener('click', function() {
                 const drawingData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
                 // Check if there is any drawing on the canvas
@@ -96,174 +105,6 @@
                 // Additional logic to process LaTeX conversion if needed
             });
         });
-
-        // TensorFlow.js functionality
-        import * as tf from '@tensorflow/tfjs';
-        import * as tfvis from '@tensorflow/tfjs-vis';
-        import { MnistData } from './data.js';
-
-        const classNames = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
-            'Eight', 'Nine', 'Ten'];
-
-        const showExamples = async data => {
-            const surface = tfvis.visor().surface({
-                name: 'Input Data Examples',
-                tab: 'Input Data'
-            });
-            const examples = data.nextTestBatch(20);
-            const numExamples = examples.xs.shape[0];
-            for (let i = 0; i < numExamples; i++) {
-                const imageTensor = tf.tidy(() => {
-                    return examples.xs
-                        .slice([i, 0], [1, examples.xs.shape[1]])
-                        .reshape([28, 28, 1]);
-                });
-                const canvas = document.createElement('canvas');
-                canvas.width = 28;
-                canvas.height = 28;
-                canvas.style = 'margin: 4px';
-                await tf.browser.toPixels(imageTensor, canvas);
-                surface.drawArea.appendChild(canvas);
-                imageTensor.dispose();
-            }
-        };
-
-        const getModel = () => {
-            const model = tf.sequential();
-            const IMAGE_WIDTH = 28;
-            const IMAGE_HEIGHT = 28;
-            const IMAGE_CHANNELS = 1;
-            model.add(tf.layers.conv2d({
-                inputShape: [IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS],
-                kernelSize: 5,
-                filters: 8,
-                strides: 1,
-                activation: 'relu',
-                kernelInitializer: 'varianceScaling'
-            }));
-            model.add(tf.layers.maxPooling2d({
-                poolSize: [2, 2],
-                strides: [2, 2]
-            }));
-            model.add(tf.layers.conv2d({
-                kernelSize: 5,
-                filters: 16,
-                strides: 1,
-                activation: 'relu',
-                kernelInitializer: 'varianceScaling'
-            }));
-            model.add(tf.layers.maxPooling2d({
-                poolSize: [2, 2],
-                strides: [2, 2]
-            }));
-            model.add(tf.layers.flatten());
-            const NUM_OUTPUT_CLASSES = 10;
-            model.add(tf.layers.dense({
-                units: NUM_OUTPUT_CLASSES,
-                kernelInitializer: 'varianceScaling',
-                activation: 'softmax'
-            }));
-            const optimizer = tf.train.adam();
-            model.compile({
-                optimizer,
-                loss: 'categoricalCrossentropy',
-                metrics: ['accuracy']
-            });
-            return model;
-        };
-
-        const train = async (model, data) => {
-            const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
-            const container = {
-                name: 'Model Training',
-                styles: {
-                    height: '1000px'
-                }
-            };
-            const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
-            const BATCH_SIZE = 512;
-            const TRAIN_DATA_SIZE = 5500;
-            const TEST_DATA_SIZE = 1000;
-            const [trainXs, trainYs] = tf.tidy(() => {
-                const d = data.nextTrainBatch(TRAIN_DATA_SIZE);
-                return [
-                    d.xs.reshape([TRAIN_DATA_SIZE, 28, 28, 1]),
-                    d.labels
-                ];
-            });
-            const [testXs, testYs] = tf.tidy(() => {
-                const d = data.nextTestBatch(TEST_DATA_SIZE);
-                return [
-                    d.xs.reshape([TEST_DATA_SIZE, 28, 28, 1]),
-                    d.labels
-                ];
-            });
-            return model.fit(trainXs, trainYs, {
-                batchSize: BATCH_SIZE,
-                validationData: [testXs, testYs],
-                epochs: 10,
-                shuffle: true,
-                callbacks: fitCallbacks
-            });
-        };
-
-        const doPrediction = (model, data, testDataSize = 500) => {
-            const IMAGE_WIDTH = 28;
-            const IMAGE_HEIGHT = 28;
-            const testData = data.nextTestBatch(testDataSize);
-            const testxs = testData.xs.reshape([testDataSize, IMAGE_WIDTH, IMAGE_HEIGHT, 1]);
-            const labels = testData.labels.argMax([-1]);
-            const preds = model.predict(testxs).argMax([-1]);
-            testxs.dispose();
-            return [preds, labels];
-        };
-
-        const showAccuracy = async (model, data) => {
-            const [preds, labels] = doPrediction(model, data);
-            const classAccuracy = await tfvis.metrics.perClassAccuracy(labels, preds);
-            const container = {
-                name: 'Accuracy',
-                tab: 'Evaluation'
-            };
-            tfvis.show.perClassAccuracy(container, classAccuracy, classNames);
-            labels.dispose();
-        };
-
-        const showConfusion = async (model, data) => {
-            const [preds, labels] = doPrediction(model, data);
-            const confusionMatrix = await tfvis.metrics.confusionMatrix(labels, preds);
-            const container = {
-                name: 'Confusion Matrix',
-                tab: 'Evaluation'
-            };
-            tfvis.render.confusionMatrix(
-                container,
-                {
-                    values: confusionMatrix
-                },
-                classNames
-            );
-            labels.dispose();
-        };
-
-        const run = async () => {
-            const data = new MnistData();
-            await data.load();
-            await showExamples(data);
-            const model = getModel();
-            tfvis.show.modelSummary({
-                name: 'Model Architecture'
-            }, model);
-            await train(model, data);
-            await showAccuracy(model, data);
-            await showConfusion(model, data);
-        };
-
-        // Import data.js module
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.src = './data.js';
-        document.body.appendChild(script);
     </script>
 </body>
 </html>
