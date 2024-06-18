@@ -16,6 +16,8 @@
             margin-top: 10px;
         }
     </style>
+    <!-- Include MathJax for rendering LaTeX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <h1>Drawing Pad</h1>
@@ -26,6 +28,7 @@
     </div>
     <h2>LaTeX Output</h2>
     <pre id="latex-output"></pre>
+    <div id="rendered-latex"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -34,6 +37,7 @@
             const clearButton = document.getElementById('clear');
             const convertButton = document.getElementById('convert');
             const latexOutput = document.getElementById('latex-output');
+            const renderedLatex = document.getElementById('rendered-latex');
             let drawing = false;
 
             function startDrawing(event) {
@@ -86,6 +90,8 @@
 
             clearButton.addEventListener('click', function() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                latexOutput.innerText = '';
+                renderedLatex.innerHTML = '';
             });
 
             convertButton.addEventListener('click', function() {
@@ -102,7 +108,8 @@
                 // Example LaTeX output
                 const exampleLatex = "\\frac{d}{dx}f(x) = \\lim_{{h \\to 0}} \\frac{f(x+h) - f(x)}{h}";
                 latexOutput.innerText = exampleLatex;
-                // Additional logic to process LaTeX conversion if needed
+                renderedLatex.innerHTML = `$$${exampleLatex}$$`; // Render LaTeX using MathJax
+                MathJax.typesetPromise(); // Update MathJax rendering
             });
         });
     </script>
